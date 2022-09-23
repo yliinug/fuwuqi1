@@ -1,483 +1,1196 @@
 <!DOCTYPE html>
-<html lang="zh">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>文件夹内容预览特效</title>
-	<link rel="stylesheet" type="text/css" href="normalize.css" />
-	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,400,700" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="demo.css" />
-	<script>
-		document.documentElement.className = 'js';
-		function browserCanUseCssVariables() { return window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0); }
-		if (!browserCanUseCssVariables()) alert('你的浏览器不支持CSS 变量。请使用其它现代浏览器来查看这个DEMO！');
-	</script>
-</head>
-<body>
-	<svg class="hidden">
-			<symbol id="icon-arrow" viewBox="0 0 24 24">
-				<title>arrow</title>
-				<polygon points="6.3,12.8 20.9,12.8 20.9,11.2 6.3,11.2 10.2,7.2 9,6 3.1,12 9,18 10.2,16.8 "/>
-			</symbol>
-			<symbol id="icon-drop" viewBox="0 0 24 24">
-				<title>drop</title>
-				<path d="M12,21c-3.6,0-6.6-3-6.6-6.6C5.4,11,10.8,4,11.4,3.2C11.6,3.1,11.8,3,12,3s0.4,0.1,0.6,0.3c0.6,0.8,6.1,7.8,6.1,11.2C18.6,18.1,15.6,21,12,21zM12,4.8c-1.8,2.4-5.2,7.4-5.2,9.6c0,2.9,2.3,5.2,5.2,5.2s5.2-2.3,5.2-5.2C17.2,12.2,13.8,7.3,12,4.8z"/><path d="M12,18.2c-0.4,0-0.7-0.3-0.7-0.7s0.3-0.7,0.7-0.7c1.3,0,2.4-1.1,2.4-2.4c0-0.4,0.3-0.7,0.7-0.7c0.4,0,0.7,0.3,0.7,0.7C15.8,16.5,14.1,18.2,12,18.2z"/>
-			</symbol>
-			<symbol id="icon-folderback" viewBox="0 0 20 16">
-				<title>folder-back</title>
-				<path d="M7.5,0C7.4,0,2,0,2,0C0.9,0,0,0.9,0,2l0,12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V4c0-1.1-0.9-2-2-2c0,0-7.5,0-8,0C9,2,9.9,0,7.5,0z"/>
-			</symbol>
-			<symbol id="icon-foldercover" viewBox="0 0 20 16">
-				<title>folder-cover</title>
-				<path d="M2,2h16c1.1,0,2,0.9,2,2v10c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2V4C0,2.9,0.9,2,2,2z"/>
-			</symbol>
-			<symbol id="icon-folderdummy" viewBox="0 0 20 16">
-				<title>folder-dummy</title>
-				<path d="M7.5,0C7.4,0,2,0,2,0C0.9,0,0,0.9,0,2l0,12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V4c0-1.1-0.9-2-2-2c0,0-7.5,0-8,0C9,2,9.9,0,7.5,0z"/><path d="M2,2h16c1.1,0,2,0.9,2,2v10c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2V4C0,2.9,0.9,2,2,2z"/>
-			</symbol>
-			<symbol id="icon-users" viewBox="0 0 24 24">
-				<title>users</title>
-				<path style="opacity:0.3;" d="M22.2,17.7l-4-2c-0.5-0.3-0.8-0.8-0.8-1.3v-1.6c0.1-0.1,0.2-0.3,0.4-0.5c0.5-0.8,0.9-1.6,1.2-2.5
-				c0.5-0.2,0.9-0.6,0.9-1.2V7c0-0.4-0.2-0.7-0.4-0.9V3.7c0,0,0.5-3.7-4.6-3.7c-5,0-4.6,3.7-4.6,3.7v2.4C10.1,6.3,9.9,6.7,9.9,7v1.7
-				c0,0.4,0.2,0.8,0.6,1c0.4,1.8,1.5,3.1,1.5,3.1v1.5c0,0.6-0.3,1.1-0.8,1.3l-3.7,2c-1.1,0.6-1.7,1.7-1.7,2.9v1.3H24v-1.3
-				C24,19.4,23.3,18.3,22.2,17.7z"/>
-				<path style="opacity:0.5;" d="M7.5,17.7l2.5-1.3c0,0,0,0,0,0l1.2-0.7c0.5-0.3,0.8-0.8,0.8-1.3v-1.5c0,0-0.4-0.5-0.9-1.4l0,0c0,0,0,0,0,0
-				c-0.1-0.1-0.1-0.2-0.2-0.3c0,0,0,0,0-0.1c-0.1-0.1-0.1-0.3-0.2-0.4c0,0,0,0,0,0c0-0.1-0.1-0.2-0.1-0.4c0,0,0-0.1,0-0.1
-				c0-0.1-0.1-0.3-0.1-0.4c-0.3-0.2-0.6-0.6-0.6-1V7c0-0.4,0.2-0.7,0.4-0.9V3.8C9.8,3.3,8.9,2.9,7.4,2.9c-4,0-4.1,3.3-4.1,3.3v2.1
-				C3.1,8.5,2.9,8.8,2.9,9.1v1.4c0,0.4,0.2,0.7,0.5,0.9c0.4,1.6,1.6,2.7,1.6,2.7v1.3c0,0.5-0.3,0.9-0.7,1.1l-2.8,1.7
-				C0.6,18.8,0,19.7,0,20.8v1.2h5.8v-1.3C5.8,19.4,6.5,18.3,7.5,17.7z"/>
-			</symbol>
-			<symbol id="icon-file" viewBox="0 0 20 26.8">
-				<title>file</title>
-				<path d="M2.3,0C1,0,0,1,0,2.3v22.2c0,1.2,1,2.3,2.3,2.3h15.4c1.2,0,2.3-1,2.3-2.3V6l-6-6H2.3z"/>
-				<path style="opacity:0.1;fill:#000;" d="M13.9,3.7V0l6,6h-3.7C14.9,6,13.9,5,13.9,3.7z"/>
-			</symbol>
-			<symbol id="icon-padlock" viewBox="0 0 24 33.6">
-				<title>padlock</title>
-				<path d="M23,13.5h-1.7V9.4C21.4,4.2,17.2,0,12,0C6.8,0,2.6,4.2,2.6,9.4v4.1H1c-0.5,0-1,0.4-1,1v18.2c0,0.5,0.4,1,1,1H23c0.5,0,1-0.4,1-1V14.4C24,13.9,23.6,13.5,23,13.5z M13.5,24.5v3.9c0,0.3-0.3,0.6-0.6,0.6h-1.8c-0.3,0-0.6-0.3-0.6-0.6v-3.9c-0.7-0.5-1.1-1.3-1.1-2.1c0-1.4,1.2-2.6,2.6-2.6c1.4,0,2.6,1.2,2.6,2.6C14.6,23.3,14.2,24.1,13.5,24.5z M16.9,13.5H7.1V9.4c0-2.7,2.2-4.9,4.9-4.9c2.7,0,4.9,2.2,4.9,4.9V13.5z"/>
-			</symbol>
-			<symbol id="icon-cloud" viewBox="0 0 24 22.2">
-				<title>cloud</title>
-				<path d="M19.5,5.8c-0.3-1.5-1-2.9-2.2-4c-1.3-1.2-3-1.8-4.7-1.8C11.3,0,10,0.4,8.9,1.1C8,1.7,7.2,2.5,6.6,3.5c-0.2,0-0.5-0.1-0.7-0.1c-2.1,0-3.8,1.7-3.8,3.8c0,0.3,0,0.5,0.1,0.8C0.8,9,0,10.6,0,12.3C0,13.6,0.5,15,1.4,16c1,1.1,2.2,1.7,3.6,1.8c0,0,0,0,0,0h4.2c0.4,0,0.7-0.3,0.7-0.7s-0.3-0.7-0.7-0.7H5c-2-0.1-3.7-2-3.7-4.2c0-1.4,0.8-2.7,2-3.4c0.3-0.2,0.4-0.5,0.3-0.8C3.5,7.8,3.4,7.5,3.4,7.2c0-1.4,1.1-2.5,2.5-2.5c0.3,0,0.6,0,0.8,0.1c0.3,0.1,0.7,0,0.8-0.3c0.9-2,2.9-3.2,5.1-3.2c2.9,0,5.3,2.2,5.6,5.1c0,0.3,0.3,0.5,0.6,0.6c2.2,0.4,3.9,2.4,3.9,4.7c0,2.5-1.9,4.6-4.3,4.8h-3.6c-0.4,0-0.7,0.3-0.7,0.7s0.3,0.7,0.7,0.7h3.7c0,0,0,0,0,0c1.5-0.1,2.9-0.8,4-2c1-1.1,1.6-2.6,1.6-4.1C24,8.9,22.1,6.5,19.5,5.8z M16,12.9c0.3-0.3,0.3-0.7,0-0.9l-3.5-3.5c-0.1-0.1-0.3-0.2-0.5-0.2c-0.2,0-0.3,0.1-0.5,0.2L8,12c-0.3,0.3-0.3,0.7,0,0.9c0.1,0.1,0.3,0.2,0.5,0.2c0.2,0,0.3-0.1,0.5-0.2l2.4-2.4v11c0,0.4,0.3,0.7,0.7,0.7s0.7-0.3,0.7-0.7v-11l2.4,2.4C15.3,13.2,15.7,13.2,16,12.9z"/>
-			</symbol>
-			<symbol id="icon-globe" viewBox="0 0 24 24">
-				<title>globe</title>
-				<path d="M12,0C5.4,0,0,5.4,0,12s5.4,12,12,12c6.6,0,12-5.4,12-12C24,5.4,18.6,0,12,0z M9.7,4.3l0.6,0.2V3.7l0.2-0.2L10.7,4l0.4,0.5L11,4.8l-0.7,0.2V4.5L9.7,4.9L9.5,4.7L9.7,4.3z M1,11.7c0.1-2.3,0.8-4.5,2.1-6.2c0,0,0.1,0,0.1,0c0,0.2-0.2,0.2,0,0.6c0.3,0.5,0,0.8,0,0.8S2.6,7.4,2.5,7.5C2.3,7.6,2,8.1,2.2,7.9C2.4,7.8,2.7,7.7,2.5,8C2.3,8.3,1.9,8.9,1.8,9.1c-0.1,0.2-0.5,0.7-0.5,1s-0.2,0.7-0.1,1C1.2,11.1,1.1,11.6,1,11.7z M5.3,18.6l-0.2,0.6l0.2,0.5c0,0-0.2,0.2-0.4,0.2c-0.2,0-0.2,0.1-0.4,0.1c-1.6-1.5-2.7-3.4-3.2-5.6c0.1,0,0.1,0.1,0.2,0.1c0.2,0.1,0.2,0.2,0.5,0.3c0.2,0.1,0.3,0.2,0.5,0.3s0.2,0,0.5,0.4C3.4,16,3.3,16,3.4,16.2c0.1,0.2,0.2,0.4,0.3,0.5C3.8,16.9,4,16.9,4.2,17c0.1,0.1,0.3,0.2,0.5,0.2c0.1,0,0.5,0.4,0.7,0.4c0.2,0,0.2,0.5,0.2,0.5L5.3,18.6z M7,2.7C6.4,3.3,6.6,3.1,6.4,3.3C6.3,3.4,6.3,3.5,6.1,3.7C5.8,3.9,5.6,4.1,5.6,4.1L5.2,4.3L4.8,4.1c0,0-0.3,0.1-0.3,0c0,0,0-0.1,0-0.1c1-0.9,2.2-1.7,3.5-2.2C8,1.9,7.8,2.1,7.8,2.1S7.5,2.1,7,2.7z M19.6,17.5c0,0.2-0.1,0.5-0.2,0.6c0,0.2-0.2,0.5-0.4,0.6c-0.1,0.1-0.3,0.3-0.5,0.4c-0.1,0-0.2-0.3-0.2-0.5c0-0.2,0.2-0.6,0.2-0.6s0-0.2,0.1-0.4c0-0.2,0.5-0.4,0.5-0.4l0.3-0.6c0,0,0,0.2,0,0.3C19.7,17,19.6,17.4,19.6,17.5z M19.7,13.6c-0.1,0.1-0.3,0.5-0.5,0.6c-0.1,0.2-0.3,0.4-0.5,0.6c-0.2,0.2-0.2,0.4-0.4,0.6C18.2,15.6,18,16,18,16s0.1,0.8,0.1,1c0,0.2-0.3,0.6-0.3,0.6L17.5,18L17,18.6l0,0.6c0,0-0.4,0.3-0.6,0.5c-0.2,0.2-0.2,0.3-0.3,0.5c-0.2,0.2-0.6,0.5-0.8,0.5c-0.2,0-0.9,0.2-0.9,0.2v-0.4L14.3,20c0,0-0.2-0.5-0.4-0.7c-0.1-0.2-0.1-0.4-0.3-0.6c-0.2-0.2-0.3-0.4-0.3-0.5c0-0.1,0-0.5,0-0.5s0.2-0.5,0.2-0.6c0.1-0.2,0-0.4-0.1-0.6c-0.1-0.2-0.1-0.6-0.1-0.7c0-0.1-0.3-0.3-0.5-0.5c-0.1-0.1-0.1-0.3-0.1-0.5c0-0.2-0.1-0.5-0.1-0.8c0-0.3-0.4-0.1-0.6,0c-0.2,0.1-0.4-0.1-0.4-0.3c0-0.2-0.5,0-0.7,0.1c-0.3,0.2-0.6,0.2-1,0.3c-0.3,0.1-0.5-0.1-0.5-0.1S9.2,13.8,9,13.7c-0.2-0.1-0.4-0.4-0.6-0.6c-0.2-0.2-0.6-0.8-0.6-1.1c0-0.2,0-0.4,0-0.7c0-0.3,0-0.5,0-0.7c0-0.2,0.2-0.5,0.3-0.7c0.1-0.2,0.6-0.5,0.7-0.5C8.9,9.4,9.2,9.2,9.2,9c0-0.2,0.2-0.2,0.2-0.4C9.5,8.4,9.8,8,10.2,8.2c0,0,0.3,0,0.5-0.1c0.1,0,0.5-0.2,0.6-0.2c0.2-0.1,0.6-0.1,0.6-0.1s0.3,0.1,0.4,0.1c0.1,0,0.5-0.1,0.5-0.1S13,8.4,13,8.5c0,0.1,0.1,0.2,0.3,0.3c0.2,0.1,1.2,0.3,1.6,0c0.1-0.1,0.4,0.1,0.4,0.1s1,0.2,1.2,0.3c0.2,0.1,0.5,0.2,0.5,0.3c0.1,0.1,0.4,0.5,0.4,0.6c0,0.1,0.2,0.6,0.3,0.7c0,0.2,0.2,0.6,0.3,0.8c0.1,0.2,0.8,1.1,1.1,1.5l0.7-0.1C19.9,13.1,19.8,13.5,19.7,13.6z M22.7,12.1c0-0.2-0.3-0.7-0.3-0.7S22.2,11,22,10.9c-0.2-0.1-0.3-0.3-0.6-0.5c-0.3-0.2-0.4-0.2-0.7-0.2c-0.2,0-0.5-0.3-0.8-0.5c-0.3-0.2-0.3-0.1-0.3-0.1s0.3,0.5,0.3,0.6s0.4,0.3,0.7,0.2c0,0,0.2,0.5,0.4,0.6s0,0.2-0.3,0.4c-0.2,0.2-0.2,0.1-0.3,0.2c-0.1,0.1-0.5,0.3-0.7,0.4c-0.1,0.1-0.6,0.3-0.9,0.1c-0.1-0.1-0.1-0.4-0.2-0.5c-0.1-0.2-0.9-1.4-1.4-2c-0.1-0.1-0.2-0.4-0.4-0.5c-0.1-0.1,0.3-0.1,0.3-0.1s0-0.3,0-0.5c0-0.2,0-0.5,0-0.5s-0.4,0.2-0.5,0.3c-0.1,0.1-0.2-0.2-0.4-0.4c-0.2-0.2-0.3-0.5-0.4-0.7c0-0.2,0.2-0.3,0.2-0.3l0.4-0.2c0,0,0.5-0.1,0.7,0c0.3,0,0.7,0.1,0.7,0.1s0.1-0.3,0-0.4c-0.2-0.1-0.5-0.3-0.7-0.3c-0.2,0,0.1-0.2,0.3-0.4l-0.5-0.1c0,0-0.4,0.2-0.5,0.2c-0.1,0-0.3,0.1-0.5,0.3C16,6.6,16.2,6.9,16,6.9c-0.2,0.1-0.3,0.1-0.4,0.2c-0.1,0-0.5,0-0.5,0c-0.4,0-0.2,0.4,0,0.5l-0.3-0.4l-0.2-0.6c0,0-0.4-0.2-0.5-0.3c-0.2-0.1-0.7-0.4-0.7-0.4l0,0.4l0.5,0.5l0,0l0.3,0.3l-0.5,0V6.9c-0.8-0.1-0.4-0.3-0.5-0.3c-0.1-0.1-0.4-0.3-0.4-0.3s-0.5,0.1-0.6,0.1c-0.1,0-0.2,0.2-0.4,0.2c-0.2,0.1-0.4,0.2-0.4,0.3s-0.4,0.5-0.5,0.7c-0.2,0.2-0.5,0.1-0.6,0.1c-0.1,0-0.7-0.2-0.7-0.2V6.9c0,0,0.1-0.4,0-0.5l0.4-0.1l0.6-0.1l0.2-0.1l0.3-0.3c0,0-0.3-0.2-0.1-0.5c0.1-0.1,0.5-0.2,0.6-0.3c0.2-0.1,0.4-0.2,0.4-0.2s0.3-0.2,0.6-0.5c0,0,0.2-0.1,0.5-0.2c0,0,0.7,0.6,0.8,0.6s0.6-0.3,0.6-0.3s0.1-0.4,0.1-0.5c0-0.1-0.2-0.5-0.2-0.5S14,3.5,13.8,3.7C13.7,3.8,13.6,4,13.6,4S13,4,13,3.9c0-0.1-0.1-0.3-0.2-0.5c0-0.1-0.4-0.1-0.6,0c-0.2,0.1,0-0.4,0-0.4s0.2-0.3,0.4-0.3c0.2,0,0.5-0.2,0.7-0.3C13.5,2.3,14,2,14.2,2c0.2,0,0.5,0,0.6,0c0.1,0,0.6,0,0.6,0L16.3,2c0,0,0.7,0.3,0.5,0.5c0,0,0.3,0.2,0.4,0.3c0.1,0.1,0.4-0.1,0.6-0.2C20.9,4.6,23,8.1,23,12c0,0.2,0,0.4,0,0.6C22.9,12.4,22.7,12.2,22.7,12.1z M9.9,4.5L9.9,4.5L9.9,4.5L9.9,4.5z"/>
-			</symbol>
-		</svg>
-		<main>
-			<div class="message-mobile">These are hover effects. Best viewed on desktop.</div>
-			<section class="content content--devi">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--devi">
-							<div class="folder__icon">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__preview folder__preview--thumbs">
-									<img class="folder__thumb" src="user1.svg" />
-									<img class="folder__thumb" src="user2.svg" />
-									<img class="folder__thumb" src="user3.svg" />
-									<img class="folder__thumb" src="user4.svg" />
-									<img class="folder__thumb" src="user5.svg" />
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-users"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Devi</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--rudras">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--rudras">
-							<div class="folder__icon folder__icon--perspective">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-deco"></div>
-								<div class="folder__preview folder__preview--thumbs">
-									<img class="folder__thumb" src="user1.svg" />
-									<img class="folder__thumb" src="user2.svg" />
-									<img class="folder__thumb" src="user3.svg" />
-									<img class="folder__thumb" src="user4.svg" />
-									<img class="folder__thumb" src="user5.svg" />
-									<img class="folder__thumb" src="user6.svg" />
-									<img class="folder__thumb" src="user7.svg" />
-									<img class="folder__thumb" src="user8.svg" />
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-users"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Rudras</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--ardra">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--ardra">
-							<div class="folder__feedback"></div>
-							<div class="folder__preview folder__preview--thumbs">
-								<img class="folder__thumb" src="photo1.png" />
-								<img class="folder__thumb" src="photo2.png" />
-								<img class="folder__thumb" src="photo3.png" />
-								<img class="folder__thumb" src="photo4.png" />
-								<img class="folder__thumb" src="photo5.png" />
-								<img class="folder__thumb" src="photo6.png" />
-								<img class="folder__thumb" src="photo7.png" />
-								<img class="folder__thumb" src="photo8.png" />
-							</div>
-							<div class="folder__icon">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-globe"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Ardra</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--shakti">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--shakti">
-							<div class="folder__icon">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__preview folder__preview--thumbs">
-									<img class="folder__thumb" src="file_4.svg" />
-									<img class="folder__thumb" src="file_5.svg" />
-									<img class="folder__thumb" src="file_6.svg" />
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-padlock"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Shakti</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--kubera">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--kubera">
-							<div class="folder__icon folder__icon--perspective">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-deco"></div>
-								<div class="folder__preview folder__preview--thumbs">
-									<img class="folder__thumb" src="photo9.png" />
-									<img class="folder__thumb" src="photo10.png" />
-									<img class="folder__thumb" src="photo11.png" />
-									<img class="folder__thumb" src="photo12.png" />
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-cloud"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Kubera</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--hari">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--hari">
-							<div class="folder__feedback"></div>
-							<div class="folder__preview folder__preview--thumbs">
-								<img class="folder__thumb" src="file_1.svg" />
-								<img class="folder__thumb" src="file_2.svg" />
-								<img class="folder__thumb" src="file_3.svg" />
-							</div>
-							<div class="folder__icon folder__icon--perspective">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-deco"></div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-globe"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Hari</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--ravi">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--ravi">
-							<div class="folder__icon folder__icon--perspective">
-								<div class="folder__feedback"></div>
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-deco"></div>
-								<div class="folder__preview folder__preview--thumbs">
-									<img class="folder__thumb" src="photo13.png" />
-									<img class="folder__thumb" src="photo15.png" />
-									<img class="folder__thumb" src="photo14.png" />
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-padlock"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Ravi</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--durga">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--durga">
-							<div class="folder__icon folder__icon--perspective">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-deco"></div>
-								<div class="folder__preview folder__preview--text">
-									<p class="folder__detail">sfsfsf为什那么</p>
-									<p class="folder__detail">adasd</p>
-									<p class="folder__detail">fghfh</p>
-									<p class="folder__detail">dfgfd</p>
-									<p class="folder__detail">dfgdfg</p>
-									<p class="folder__detail">dfgdfg</p>
-									<p class="folder__detail">dfgfr</p>
-									<p class="folder__detail">...</p>
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-globe"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Durga</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-			<section class="content content--nandi">
-				<div class="grid">
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item">
-						<div class="folder folder--nandi">
-							<div class="folder__icon folder__icon--perspective">
-								<div class="folder__icon-img folder__icon-img--back">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-folderback"></use></svg>
-								</div>
-								<div class="folder__icon-deco"></div>
-								<div class="folder__preview folder__preview--magnifier">
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--txt"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">qa.txt</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--mp3"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">cats.mp3</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--gif"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">funny.gif</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--gif"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">hoho.gif</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--txt"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">letter.txt</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--gif"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">boss.gif</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--txt"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">ufo.txt</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg folder__detail-svg--mp3"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">不止如此.jpg</span>
-									</p>
-									<p class="folder__detail">
-										<svg class="folder__detail-svg"><use xlink:href="#icon-file"></use></svg>
-										<span class="folder__detail-text">&bull;&bull;&bull;</span>
-									</p>
-								</div>
-								<div class="folder__icon-img folder__icon-img--cover">
-									<svg class="folder__icon-svg"><use xlink:href="#icon-foldercover"></use></svg>
-									<svg class="folder__icon-svg folder__icon-svg--deco"><use xlink:href="#icon-cloud"></use></svg>
-								</div>
-							</div>
-							<h3 class="folder__caption">Nandi</h3>
-						</div>
-					</div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-					<div class="grid__item"><div class="dummy"><svg><use xlink:href="#icon-folderdummy"></use></svg></div></div>
-				</div><!-- /grid-->
-			</section>
-		</main>
-	
-	<script src="anime.min.js"></script>
-	<script src="charming.min.js"></script>
-	<script src="main.js"></script>
-	<script>
-	(function() {
-		new DeviFx(document.querySelector('.content--devi .folder--devi'));
-		new RudrasFx(document.querySelector('.content--rudras .folder--rudras'));
-		new ArdraFx(document.querySelector('.content--ardra .folder--ardra'));
-		new ShaktiFx(document.querySelector('.content--shakti .folder--shakti'));
-		new KuberaFx(document.querySelector('.content--kubera .folder--kubera'));
-		new HariFx(document.querySelector('.content--hari .folder--hari'));
-		new RaviFx(document.querySelector('.content--ravi .folder--ravi'));
-		new DurgaFx(document.querySelector('.content--durga .folder--durga'));
-		new NandiFx(document.querySelector('.content--nandi .folder--nandi'));
-	})();
-	</script>
-</body>
+<html lang="en">
+    <head>
+        
+
+        <meta charset="utf-8">
+                <title>Unikit - Admin & Dashboard Template</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                <meta content="Premium Multipurpose Admin & Dashboard Template" name="description">
+                <meta content="" name="author">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+       
+
+         <!-- App css -->
+         <link href="bootstrap.min.css" rel="stylesheet" type="text/css">
+         <link href="static/css/icons.min.css" rel="stylesheet" type="text/css">
+         <link href="app.min.css" rel="stylesheet" type="text/css">
+
+    </head>
+
+    <body id="body" class="dark-sidebar">
+        <!-- leftbar-tab-menu -->
+        <div class="left-sidebar">
+            <!-- LOGO -->
+            <div class="brand">
+                <a href="" class="logo">
+                    <span>
+                        <img src="logo-sm.png" alt="logo-small" class="logo-sm">
+                    </span>
+                    <span>
+                        <img src="logo.png" alt="logo-large" class="logo-lg logo-light">
+                        <img src="logo-dark.png" alt="logo-large" class="logo-lg logo-dark">
+                    </span>
+                </a>
+            </div>
+            <div class="sidebar-user-pro media border-end">                    
+                <div class="position-relative mx-auto">
+                    <img src="user-4.jpg" alt="user" class="rounded-circle thumb-md">
+                    <span class="online-icon position-absolute end-0"><i class="mdi mdi-record text-success"></i></span>
+                </div>
+                <div class="media-body ms-2 user-detail align-self-center">
+                    <h5 class="font-14 m-0 fw-bold">Mr. Michael Hill </h5>  
+                    <p class="opacity-50 mb-0">michael.hill@exemple.com</p>          
+                </div>                    
+            </div>
+            <div class="border-end">
+                <ul class="nav nav-tabs menu-tab nav-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#Main" role="tab" aria-selected="true">M<span>ain</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Extra" role="tab" aria-selected="false">E<span>xtra</span></a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Tab panes -->
+    
+            <!--end logo-->
+            <div class="menu-content h-100" data-simplebar="">
+                <div class="menu-body navbar-vertical">
+                    <div class="collapse navbar-collapse tab-content" id="sidebarCollapse">
+                        <!-- Navigation -->
+                        <ul class="navbar-nav tab-pane active" id="Main" role="tabpanel">
+                            <li class="menu-label mt-0 text-primary font-12 fw-semibold">M<span>ain</span><br><span class="font-10 text-secondary fw-normal">Unique Dashboard</span></li>                    
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarAnalytics" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAnalytics">
+                                    <i class="ti ti-stack menu-icon"></i>
+                                    <span>Analytics</span>
+                                </a>
+                                <div class="collapse " id="sidebarAnalytics">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="">Dashboard</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a href="analytics-customers.html" class="nav-link ">Customers</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a href="analytics-reports.html" class="nav-link ">Reports</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarAnalytics-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarCrypto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCrypto">
+                                    <i class="ti ti-currency-bitcoin menu-icon"></i>
+                                    <span>Crypto</span>
+                                </a>
+                                <div class="collapse " id="sidebarCrypto">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="crypto-index.html">Dashboard</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="crypto-exchange.html">Exchange</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="crypto-wallet.html">Wallet</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="crypto-news.html">Crypto News</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="crypto-ico.html">ICO List</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="crypto-settings.html">Settings</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarCrypto-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarProjects" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProjects">
+                                    <i class="ti ti-brand-asana menu-icon"></i>
+                                    <span>Projects</span>
+                                </a>
+                                <div class="collapse " id="sidebarProjects">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-index.html">Dashboard</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-clients.html">Clients</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-team.html">Team</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-project.html">Project</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-task.html">Task</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-kanban-board.html">Kanban Board</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-chat.html">Chat</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-users.html">Users</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="projects-create.html">Project Create</a>
+                                        </li><!--end nav-item--> 
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarProjects-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarEcommerce" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarEcommerce">
+                                    <i class="ti ti-shopping-cart menu-icon"></i>
+                                    <span>Ecommerce</span>
+                                </a>
+                                <div class="collapse " id="sidebarEcommerce">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ecommerce-index.html">Dashboard</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ecommerce-products.html">Products</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ecommerce-product-list.html">Product List</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ecommerce-product-detail.html">Product Detail</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ecommerce-cart.html">Cart</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ecommerce-checkout.html">Checkout</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarEcommerce-->
+                            </li><!--end nav-item-->
+
+                            <li class="menu-label mt-0 text-primary font-12 fw-semibold">A<span>pps</span><br><span class="font-10 text-secondary fw-normal">Morder Applications</span></li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarEmail" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarEmail">
+                                    <i class="ti ti-mail menu-icon"></i>
+                                    <span>Email</span>
+                                </a>
+                                <div class="collapse " id="sidebarEmail">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="apps-email-inbox.html">Inbox</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="apps-email-read.html">Read Email</a>
+                                        </li><!--end nav-item--> 
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarEmail-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="apps-chat.html"><i class="ti ti-brand-hipchat menu-icon"></i><span>Chat</span></a>
+                            </li><!--end nav-item-->
+                            <li class="nav-item">
+                                <a class="nav-link" href="apps-contact-list.html"><i class="ti ti-headphones menu-icon"></i><span>Contact List</span></a>
+                            </li><!--end nav-item-->
+                            <li class="nav-item">
+                                <a class="nav-link" href="apps-calendar.html"><i class="ti ti-calendar menu-icon"></i><span>Calendar</span></a>
+                            </li><!--end nav-item-->
+                            <li class="nav-item">
+                                <a class="nav-link" href="apps-invoice.html"><i class="ti ti-file-invoice menu-icon"></i><span>Invoice</span></a>
+                            </li><!--end nav-item-->
+                            <li class="menu-label mt-0 text-primary font-12 fw-semibold">C<span>omponents</span><br><span class="font-10 text-secondary fw-normal">Bootstrap & Custom</span></li> 
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarElements" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarElements">
+                                    <i class="ti ti-planet menu-icon"></i>
+                                <span>UI Elements</span>
+                                </a>
+                                <div class="collapse " id="sidebarElements">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-alerts.html">Alerts</a>
+                                        </li><!--end nav-item--> 
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-avatar.html">Avatar</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-buttons.html">Buttons</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-badges.html">Badges</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-cards.html">Cards</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-carousels.html">Carousels</a>
+                                        </li><!--end nav-item-->                                
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-dropdowns.html">Dropdowns</a>
+                                        </li><!--end nav-item-->                                   
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-grids.html">Grids</a>
+                                        </li><!--end nav-item-->                                
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-images.html">Images</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-list.html">List</a>
+                                        </li><!--end nav-item-->                                   
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-modals.html">Modals</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-navs.html">Navs</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-navbar.html">Navbar</a>
+                                        </li><!--end nav-item--> 
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-paginations.html">Paginations</a>
+                                        </li><!--end nav-item-->   
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-popover-tooltips.html">Popover & Tooltips</a>
+                                        </li><!--end nav-item-->                                
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-progress.html">Progress</a>
+                                        </li><!--end nav-item-->                                
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-spinners.html">Spinners</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-tabs-accordions.html">Tabs & Accordions</a>
+                                        </li><!--end nav-item-->                               
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-typography.html">Typography</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="ui-videos.html">Videos</a>
+                                        </li><!--end nav-item--> 
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarElements-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarAdvancedUI" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAdvancedUI">
+                                    <i class="ti ti-chart-bubble menu-icon"></i>
+                                    <span>Advanced UI</span>
+                                </a>
+                                <div class="collapse " id="sidebarAdvancedUI">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-animation.html">Animation</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-clipboard.html">Clip Board</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-dragula.html">Dragula</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-files.html">File Manager</a>
+                                        </li><!--end nav-item--> 
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-highlight.html">Highlight</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-rangeslider.html">Range Slider</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-ratings.html">Ratings</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-ribbons.html">Ribbons</a>
+                                        </li><!--end nav-item-->                                  
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-sweetalerts.html">Sweet Alerts</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="advanced-toasts.html">Toasts</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarAdvancedUI-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarForms" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarForms">
+                                    <i class="ti ti-forms menu-icon"></i>
+                                    <span>Forms</span>
+                                </a>
+                                <div class="collapse " id="sidebarForms">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-elements.html">Basic Elements</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-advanced.html">Advance Elements</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-validation.html">Validation</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-wizard.html">Wizard</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-editors.html">Editors</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-uploads.html">File Upload</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="forms-img-crop.html">Image Crop</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarForms-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarCharts" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCharts">
+                                    <i class="ti ti-chart-donut menu-icon"></i>
+                                <span>Charts</span>
+                                </a>
+                                <div class="collapse " id="sidebarCharts">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="charts-apex.html">Apex</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="charts-justgage.html">JustGage</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="charts-chartjs.html">Chartjs</a>
+                                        </li><!--end nav-item--> 
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="charts-toast-ui.html">Toast</a>
+                                        </li><!--end nav-item--> 
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarCharts-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarTables" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTables">
+                                    <i class="ti ti-table menu-icon"></i>
+                                    <span>Tables</span>
+                                </a>
+                                <div class="collapse " id="sidebarTables">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="tables-basic.html">Basic</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="tables-datatable.html">Datatables</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="tables-editable.html">Editable</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarTables-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarIcons" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarIcons">
+                                    <i class="ti ti-parachute menu-icon"></i>
+                                <span>Icons</span>
+                                </a>
+                                <div class="collapse " id="sidebarIcons">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="icons-materialdesign.html">Material Design</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="icons-fontawesome.html">Font awesome</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="icons-tabler.html">Tabler</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="icons-feather.html">Feather</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarIcons-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarMaps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMaps">
+                                    <i class="ti ti-map menu-icon"></i>
+                                    <span>Maps</span>
+                                </a>
+                                <div class="collapse " id="sidebarMaps">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="maps-google.html">Google Maps</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="maps-leaflet.html">Leaflet Maps</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="maps-vector.html">Vector Maps</a>
+                                        </li><!--end nav-item--> 
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarMaps-->
+                            </li><!--end nav-item-->
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarEmailTemplates" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarEmailTemplates">
+                                    <i class="ti ti-target menu-icon"></i>
+                                    <span>Email Templates</span>
+                                </a>
+                                <div class="collapse " id="sidebarEmailTemplates">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="email-templates-basic.html">Basic Action Email</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="email-templates-alert.html">Alert Email</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="email-templates-billing.html">Billing Email</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarEmailTemplates-->
+                            </li><!--end nav-item-->
+                            <li class="menu-label mt-0 text-primary font-12 fw-semibold">C<span>rafted</span><br><span class="font-10 text-secondary fw-normal">Unique Extra Pages</span></li>  
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarPages" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarPages">
+                                    <i class="ti ti-file-diff menu-icon"></i>
+                                    <span>Pages</span>
+                                </a>
+                                <div class="collapse " id="sidebarPages">
+                                    <ul class="nav flex-column">
+                                       <li class="nav-item">
+                                            <a class="nav-link" href="pages-profile.html">Profile</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-tour.html">Tour</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-timeline.html">Timeline</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="javascript:;">Treeview</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-starter.html">Starter Page</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-pricing.html">Pricing</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-blogs.html">Blogs</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-faq.html">FAQs</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="pages-gallery.html">Gallery</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarPages-->
+                            </li><!--end nav-item-->
+                            <li class="nav-item">
+                                <a class="nav-link" href="#sidebarAuthentication" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAuthentication">
+                                    <i class="ti ti-shield-lock menu-icon"></i>
+                                    <span>Authentication</span>
+                                </a>
+                                <div class="collapse " id="sidebarAuthentication">
+                                    <ul class="nav flex-column">
+                                       <li class="nav-item">
+                                            <a class="nav-link" href="auth-login.html">Log in</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="auth-register.html">Register</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="auth-recover-pw.html">Re-Password</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="auth-lock-screen.html">Lock Screen</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="auth-404.html">Error 404</a>
+                                        </li><!--end nav-item-->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="auth-500.html">Error 500</a>
+                                        </li><!--end nav-item-->
+                                    </ul><!--end nav-->
+                                </div><!--end sidebarAuthentication-->
+                            </li><!--end nav-item-->
+                        </ul>
+                        <ul class="navbar-nav tab-pane" id="Extra" role="tabpanel">
+                            <li>
+                                <div class="update-msg text-center position-relative">
+                                    <button type="button" class="btn-close position-absolute end-0 me-2" aria-label="Close"></button>
+                                    <img src="speaker-light.png" alt="" class="" height="110">
+                                    <h5 class="mt-0">Mannat Themes</h5>
+                                    <p class="mb-3">We Design and Develop Clean and High Quality Web Applications</p>
+                                    <a href="javascript: void(0);" class="btn btn-outline-warning btn-sm">Upgrade your plan</a>
+                                </div>
+                            </li>
+                        </ul><!--end navbar-nav--->
+                    </div><!--end sidebarCollapse-->
+                </div>
+            </div>    
+        </div>
+        <!-- end left-sidenav-->
+        <!-- end leftbar-menu-->
+
+        <!-- Top Bar Start -->
+        <!-- Top Bar Start -->
+        <div class="topbar">            
+            <!-- Navbar -->
+            <nav class="navbar-custom" id="navbar-custom">    
+                <ul class="list-unstyled topbar-nav float-end mb-0">
+                    <li class="dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none nav-icon" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                        <img src="us_flag.jpg" alt="" class="thumb-xxs rounded">
+                    </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#"><img src="us_flag.jpg" alt="" height="15" class="me-2">English</a>
+                            <a class="dropdown-item" href="#"><img src="spain_flag.jpg" alt="" height="15" class="me-2">Spanish</a>
+                            <a class="dropdown-item" href="#"><img src="germany_flag.jpg" alt="" height="15" class="me-2">German</a>
+                            <a class="dropdown-item" href="#"><img src="french_flag.jpg" alt="" height="15" class="me-2">French</a>
+                        </div>
+                    </li><!--end topbar-language-->
+            
+                    <li class="dropdown notification-list">
+                        <a class="nav-link dropdown-toggle arrow-none nav-icon" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <i class="ti ti-mail"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-lg pt-0">
+                
+                            <h6 class="dropdown-item-text font-15 m-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                Emails <span class="badge bg-soft-primary badge-pill">3</span>
+                            </h6> 
+                            <div class="notification-menu" data-simplebar="">
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">2 min ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <img src="user-1.jpg" alt="" class="thumb-sm rounded-circle">
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Your order is placed</h6>
+                                            <small class="text-muted mb-0">Dummy text of the printing and industry.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">10 min ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <img src="user-4.jpg" alt="" class="thumb-sm rounded-circle">
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Meeting with designers</h6>
+                                            <small class="text-muted mb-0">It is a long established fact that a reader.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">40 min ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <img src="user-2.jpg" alt="" class="thumb-sm rounded-circle">
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">UX 3 Task complete.</h6>
+                                            <small class="text-muted mb-0">Dummy text of the printing.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">1 hr ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <img src="user-5.jpg" alt="" class="thumb-sm rounded-circle">
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Your order is placed</h6>
+                                            <small class="text-muted mb-0">It is a long established fact that a reader.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">2 hrs ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <img src="user-3.jpg" alt="" class="thumb-sm rounded-circle">
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Payment Successfull</h6>
+                                            <small class="text-muted mb-0">Dummy text of the printing.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                            </div>
+                            <!-- All-->
+                            <a href="javascript:void(0);" class="dropdown-item text-center text-primary">
+                                View all <i class="fi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </li>
+
+                    <li class="dropdown notification-list">
+                        <a class="nav-link dropdown-toggle arrow-none nav-icon" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <i class="ti ti-bell"></i>
+                            <span class="alert-badge"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-lg pt-0">
+                
+                            <h6 class="dropdown-item-text font-15 m-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                Notifications <span class="badge bg-soft-primary badge-pill">2</span>
+                            </h6> 
+                            <div class="notification-menu" data-simplebar="">
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">2 min ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <i class="ti ti-chart-arcs"></i>
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Your order is placed</h6>
+                                            <small class="text-muted mb-0">Dummy text of the printing and industry.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">10 min ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <i class="ti ti-device-computer-camera"></i>
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Meeting with designers</h6>
+                                            <small class="text-muted mb-0">It is a long established fact that a reader.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">40 min ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">                                                    
+                                            <i class="ti ti-diamond"></i>
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">UX 3 Task complete.</h6>
+                                            <small class="text-muted mb-0">Dummy text of the printing.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">1 hr ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <i class="ti ti-drone"></i>
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Your order is placed</h6>
+                                            <small class="text-muted mb-0">It is a long established fact that a reader.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                                <!-- item-->
+                                <a href="#" class="dropdown-item py-3">
+                                    <small class="float-end text-muted ps-2">2 hrs ago</small>
+                                    <div class="media">
+                                        <div class="avatar-md bg-soft-primary">
+                                            <i class="ti ti-users"></i>
+                                        </div>
+                                        <div class="media-body align-self-center ms-2 text-truncate">
+                                            <h6 class="my-0 fw-normal text-dark">Payment Successfull</h6>
+                                            <small class="text-muted mb-0">Dummy text of the printing.</small>
+                                        </div><!--end media-body-->
+                                    </div><!--end media-->
+                                </a><!--end-item-->
+                            </div>
+                            <!-- All-->
+                            <a href="javascript:void(0);" class="dropdown-item text-center text-primary">
+                                View all <i class="fi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </li>
+
+                    <li class="dropdown">
+                        <a class="nav-link dropdown-toggle nav-user" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <div class="d-flex align-items-center">
+                                <img src="user-4.jpg" alt="profile-user" class="rounded-circle me-2 thumb-sm">
+                                <div>
+                                    <small class="d-none d-md-block font-11">Admin</small>
+                                    <span class="d-none d-md-block fw-semibold font-12">Maria Gibson <i class="mdi mdi-chevron-down"></i></span>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="#"><i class="ti ti-user font-16 me-1 align-text-bottom"></i> Profile</a>
+                            <a class="dropdown-item" href="#"><i class="ti ti-settings font-16 me-1 align-text-bottom"></i> Settings</a>
+                            <div class="dropdown-divider mb-0"></div>
+                            <a class="dropdown-item" href="#"><i class="ti ti-power font-16 me-1 align-text-bottom"></i> Logout</a>
+                        </div>
+                    </li><!--end topbar-profile-->
+                    <li class="notification-list">
+                        <a class="nav-link arrow-none nav-icon offcanvas-btn" href="#" data-bs-toggle="offcanvas" data-bs-target="#Appearance" role="button" aria-controls="Rightbar">
+                            <i class="ti ti-settings ti-spin"></i>
+                        </a>
+                    </li>   
+                </ul><!--end topbar-nav-->
+
+                <ul class="list-unstyled topbar-nav mb-0">                        
+                    <li>
+                        <button class="nav-link button-menu-mobile nav-icon" id="togglemenu">
+                            <i class="ti ti-menu-2"></i>
+                        </button>
+                    </li> 
+                    <li class="hide-phone app-search">
+                        <form role="search" action="#" method="get">
+                            <input type="search" name="search" class="form-control top-search mb-0" placeholder="Type text...">
+                            <button type="submit"><i class="ti ti-search"></i></button>
+                        </form>
+                    </li>                       
+                </ul>
+            </nav>
+            <!-- end navbar-->
+        </div>
+        <!-- Top Bar End -->
+        <!-- Top Bar End -->
+
+        <div class="page-wrapper">
+
+            <!-- Page Content-->
+            <div class="page-content-tab">
+
+                <div class="container-fluid">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <div class="float-end">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="#">Unikit</a>
+                                        </li><!--end nav-item-->
+                                        <li class="breadcrumb-item"><a href="#">Dashboard</a>
+                                        </li><!--end nav-item-->
+                                        <li class="breadcrumb-item active">Analytics</li>
+                                    </ol>
+                                </div>
+                                <h4 class="page-title">Analytics</h4>
+                            </div><!--end page-title-box-->
+                        </div><!--end col-->
+                    </div>
+                    <!-- end page title end breadcrumb -->
+                    
+                    <div class="row">
+                        <div class="col-md-12 col-lg-3 order-lg-1 order-md-2 order-sm-2">
+                            <div class="card overflow-hidden">
+                                <div class="card-body">
+                                    <div class="pt-3">
+                                        <h3 class="text-dark text-center font-24 fw-bold line-height-lg">Unikit
+                                        <br>Multi Application</h3>
+                                        <div class="text-center text-muted font-16 fw-bold pt-3 pb-1">We Design and Develop Clean and High Quality Web Applications</div>
+                                       
+                                        <div class="text-center py-3 mb-3">
+                                            <a href="#" class="btn btn-primary">Buy Now</a>
+                                        </div>
+                                        <img src="business.png" alt="" class="img-fluid px-3 mb-2">
+                                    </div>
+                                </div><!--end card-body--> 
+                            </div><!--end card-->                            
+                        </div> <!--end col-->
+                        <div class="col-lg-9 order-lg-2 order-md-1 order-sm-1">
+                            <div class="row justify-content-center"> 
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card overflow-hidden">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col-3">
+                                                    <i class="ti ti-users font-36 align-self-center text-dark"></i>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <div id="dash_spark_1" class="mb-3"></div>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <h3 class="text-dark my-0 font-22 fw-bold">24000</h3>
+                                                    <p class="text-muted mb-0 fw-semibold">Sessions</p>
+                                                </div><!--end col-->
+                                            </div><!--end row-->
+                                        </div><!--end card-body--> 
+                                    </div><!--end card-->                                     
+                                </div> <!--end col--> 
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card overflow-hidden">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col-3">
+                                                    <i class="ti ti-clock font-36 align-self-center text-dark"></i>
+                                                </div><!--end col-->
+                                                <div class="col-auto ms-auto align-self-center">
+                                                    <span class="badge badge-soft-success px-2 py-1 font-11">Active</span>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <div id="dash_spark_2" class="mb-3"></div>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <h3 class="text-dark my-0 font-22 fw-bold">00:18</h3>
+                                                    <p class="text-muted mb-0 fw-semibold">Avg.Sessions</p>
+                                                </div><!--end col-->
+                                            </div><!--end row-->
+                                        </div><!--end card-body--> 
+                                    </div><!--end card-->                                     
+                                </div> <!--end col--> 
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card overflow-hidden">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col-3">
+                                                    <i class="ti ti-activity font-36 align-self-center text-dark"></i>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <div id="dash_spark_3" class="mb-3"></div>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <h3 class="text-dark my-0 font-22 fw-bold">$2400</h3>
+                                                    <p class="text-muted mb-0 fw-semibold">Bounce Rate</p>
+                                                </div><!--end col-->
+                                            </div><!--end row-->
+                                        </div><!--end card-body--> 
+                                    </div><!--end card-->                                     
+                                </div> <!--end col--> 
+                                
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card overflow-hidden">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col-3">
+                                                    <i class="ti ti-confetti font-36 align-self-center text-dark"></i>
+                                                </div><!--end col-->
+                                                <div class="col-auto ms-auto align-self-center">
+                                                    <span class="badge badge-soft-danger px-2 py-1 font-11">-2%</span>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <div id="dash_spark_4" class="mb-3"></div>
+                                                </div><!--end col-->
+                                                <div class="col-12 ms-auto align-self-center">
+                                                    <h3 class="text-dark my-0 font-22 fw-bold">85000</h3>
+                                                    <p class="text-muted mb-0 fw-semibold">Goal Completions</p>
+                                                </div><!--end col-->
+                                            </div><!--end row-->
+                                        </div><!--end card-body--> 
+                                    </div><!--end card-->                                     
+                                </div> <!--end col-->                                                                   
+                            </div><!--end row-->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="row align-items-center">
+                                                <div class="col">                      
+                                                    <h4 class="card-title">Audience Overview</h4>                      
+                                                </div><!--end col-->
+                                                <div class="col-auto"> 
+                                                    <div class="dropdown">
+                                                        <a href="#" class="btn btn-sm btn-outline-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                           This Year<i class="las la-angle-down ms-1"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item" href="#">Today</a>
+                                                            <a class="dropdown-item" href="#">Last Week</a>
+                                                            <a class="dropdown-item" href="#">Last Month</a>
+                                                            <a class="dropdown-item" href="#">This Year</a>
+                                                        </div>
+                                                    </div>               
+                                                </div><!--end col-->
+                                            </div>  <!--end row-->                                  
+                                        </div><!--end card-header-->
+                                        <div class="card-body">
+                                            <div class="">
+                                                <div id="ana_dash_1" class="apex-charts"></div>
+                                            </div> 
+                                        </div><!--end card-body--> 
+                                    </div><!--end card-->
+                                </div>
+                            </div> 
+                        </div><!--end col-->                        
+                    </div><!--end row-->
+
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <div class="col">                      
+                                            <h4 class="card-title">Browser Used & Traffic Reports</h4>                      
+                                        </div><!--end col-->                                        
+                                    </div>  <!--end row-->                                  
+                                </div><!--end card-header-->
+                                <div class="card-body">
+                                    <div class="table-responsive browser_users">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="border-top-0">Browser</th>
+                                                    <th class="border-top-0">Sessions</th>
+                                                    <th class="border-top-0">Bounce Rate</th>
+                                                    <th class="border-top-0">Transactions</th>
+                                                </tr><!--end tr-->
+                                            </thead>
+                                            <tbody>
+                                                <tr>  
+                                                    <td><img src="chrome.png" alt="" height="20" class="me-2">Chrome</td> 
+                                                    <td>10853<small class="text-muted">(52%)</small></td>                                   
+                                                    <td> 52.80%</td>
+                                                    <td>566<small class="text-muted">(92%)</small></td>
+                                                </tr><!--end tr-->     
+                                                <tr>                                                        
+                                                    <td><img src="micro-edge.png" alt="" height="20" class="me-2">Microsoft Edge</td>
+                                                    <td>2545<small class="text-muted">(47%)</small></td>                                   
+                                                    <td> 47.54%</td>
+                                                    <td>498<small class="text-muted">(81%)</small></td>
+                                                </tr><!--end tr-->    
+                                                <tr>                                                        
+                                                    <td><img src="in-explorer.png" alt="" height="20" class="me-2">Internet-Explorer</td>
+                                                    <td>1836<small class="text-muted">(38%)</small></td>                                   
+                                                    <td> 41.12%</td>
+                                                    <td>455<small class="text-muted">(74%)</small></td>
+                                                </tr><!--end tr-->    
+                                                <tr>                                                        
+                                                    <td><img src="opera.png" alt="" height="20" class="me-2">Opera</td>
+                                                    <td>1958<small class="text-muted">(31%)</small></td>                                   
+                                                    <td> 36.82%</td>
+                                                    <td>361<small class="text-muted">(61%)</small></td>
+                                                </tr><!--end tr-->    
+                                                <tr>                                                        
+                                                    <td><img src="chrome.png" alt="" height="20" class="me-2">Chrome</td>
+                                                    <td>10853<small class="text-muted">(52%)</small></td>                                   
+                                                    <td> 52.80%</td>
+                                                    <td>566<small class="text-muted">(92%)</small></td>
+                                                </tr><!--end tr-->                             
+                                            </tbody>
+                                        </table> <!--end table-->                                               
+                                    </div><!--end /div--> 
+                                </div><!--end card-body--> 
+                            </div><!--end card--> 
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <div class="col">                      
+                                            <h4 class="card-title">Browser Used & Traffic Reports</h4>                      
+                                        </div><!--end col-->                                        
+                                    </div>  <!--end row-->                                  
+                                </div><!--end card-header-->
+                                <div class="card-body">
+                                    <div class="table-responsive browser_users">
+                                        <table class="table mb-0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="border-top-0">Channel</th>
+                                                    <th class="border-top-0">Sessions</th>
+                                                    <th class="border-top-0">Prev.Period</th>
+                                                    <th class="border-top-0">% Change</th>
+                                                </tr><!--end tr-->
+                                            </thead>
+                                            <tbody>
+                                                <tr>                                                        
+                                                    <td><a href="" class="text-primary">Organic search</a></td>
+                                                    <td>10853<small class="text-muted">(52%)</small></td>
+                                                    <td>566<small class="text-muted">(92%)</small></td>
+                                                    <td> 52.80% <i class="fas fa-caret-up text-success font-16"></i></td>
+                                                </tr><!--end tr-->     
+                                                <tr>                                                        
+                                                    <td><a href="" class="text-primary">Direct</a></td>
+                                                    <td>2545<small class="text-muted">(47%)</small></td>
+                                                    <td>498<small class="text-muted">(81%)</small></td>
+                                                    <td> -17.20% <i class="fas fa-caret-down text-danger font-16"></i></td>
+                                                    
+                                                </tr><!--end tr-->    
+                                                <tr>                                                        
+                                                    <td><a href="" class="text-primary">Referal</a></td>
+                                                    <td>1836<small class="text-muted">(38%)</small></td> 
+                                                    <td>455<small class="text-muted">(74%)</small></td>
+                                                    <td> 41.12% <i class="fas fa-caret-up text-success font-16"></i></td>
+                                                    
+                                                </tr><!--end tr-->    
+                                                <tr>                                                        
+                                                    <td><a href="" class="text-primary">Email</a></td>
+                                                    <td>1958<small class="text-muted">(31%)</small></td> 
+                                                    <td>361<small class="text-muted">(61%)</small></td>
+                                                    <td> -8.24% <i class="fas fa-caret-down text-danger font-16"></i></td>
+                                                </tr><!--end tr-->    
+                                                <tr>                                                        
+                                                    <td><a href="" class="text-primary">Social</a></td>
+                                                    <td>1566<small class="text-muted">(26%)</small></td> 
+                                                    <td>299<small class="text-muted">(49%)</small></td>
+                                                    <td> 29.33% <i class="fas fa-caret-up text-success"></i></td>
+                                                </tr><!--end tr-->                            
+                                            </tbody>
+                                        </table> <!--end table-->                                               
+                                    </div><!--end /div-->
+                                </div><!--end card-body--> 
+                            </div><!--end card--> 
+                        </div> <!--end col--> 
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <div class="col">                      
+                                            <h4 class="card-title">Sessions Device</h4>                      
+                                        </div><!--end col-->
+                                        <div class="col-auto"> 
+                                            <div class="dropdown">
+                                                <a href="#" class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                   All<i class="las la-angle-down ms-1"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a class="dropdown-item" href="#">Purchases</a>
+                                                    <a class="dropdown-item" href="#">Emails</a>
+                                                </div>
+                                            </div>         
+                                        </div><!--end col-->
+                                    </div>  <!--end row-->                                  
+                                </div><!--end card-header-->
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <div id="ana_device" class="apex-charts"></div>
+                                        <h6 class="bg-light-alt py-3 px-2 mb-0">
+                                            <i data-feather="calendar" class="align-self-center icon-xs me-1"></i>
+                                            01 January 2020 to 31 December 2020
+                                        </h6>
+                                    </div>  
+                                    <div class="table-responsive mt-2">
+                                        <table class="table border-dashed mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Device</th>
+                                                <th class="text-end">Sassions</th>
+                                                <th class="text-end">Day</th>
+                                                <th class="text-end">Week</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Dasktops</td>
+                                                <td class="text-end">1843</td>
+                                                <td class="text-end">-3</td>
+                                                <td class="text-end">-12</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tablets</td>
+                                                <td class="text-end">2543</td>
+                                                <td class="text-end">-5</td>
+                                                <td class="text-end">-2</td>                                                 
+                                            </tr>
+                                            <tr>
+                                                <td>Mobiles</td>
+                                                <td class="text-end">3654</td>
+                                                <td class="text-end">-5</td>
+                                                <td class="text-end">-6</td>
+                                            </tr>
+                                            
+                                            </tbody>
+                                        </table><!--end /table-->
+                                    </div><!--end /div-->                                 
+                                </div><!--end card-body--> 
+                            </div><!--end card--> 
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <h3 class="m-0 align-self-center fw-bold font-22">80</h3>
+                                        <div class="d-block ms-3 align-self-center">
+                                            <span class="badge bg-soft-primary px-2 py-1 font-11">Right now</span>
+                                            <h5 class="my-2">Traffic Sources</h5>
+                                            <p class="mb-2 text-muted">It is a long established fact that a reader will 
+                                                be of a page when looking at its layout.                                                
+                                            </p>
+                                            <a href="" class="btn btn-primary">Read More <i class="las la-arrow-right"></i></a>
+                                        </div>
+                                    </div>
+                                </div><!--end card-body-->
+                            </div><!--end card-->
+                        </div> <!--end col-->
+                        
+                    </div><!--end row-->
+                </div><!-- container -->
+
+                <!--Start Rightbar-->
+                <!--Start Rightbar/offcanvas-->
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="Appearance" aria-labelledby="AppearanceLabel">
+                    <div class="offcanvas-header border-bottom">
+                      <h5 class="m-0 font-14" id="AppearanceLabel">Appearance</h5>
+                      <button type="button" class="btn-close text-reset p-0 m-0 align-self-center" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">  
+                        <h6>Account Settings</h6>
+                        <div class="p-2 text-start mt-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="settings-switch1">
+                                <label class="form-check-label" for="settings-switch1">Auto updates</label>
+                            </div><!--end form-switch-->
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="settings-switch2" checked="">
+                                <label class="form-check-label" for="settings-switch2">Location Permission</label>
+                            </div><!--end form-switch-->
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="settings-switch3">
+                                <label class="form-check-label" for="settings-switch3">Show offline Contacts</label>
+                            </div><!--end form-switch-->
+                        </div><!--end /div-->
+                        <h6>General Settings</h6>
+                        <div class="p-2 text-start mt-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="settings-switch4">
+                                <label class="form-check-label" for="settings-switch4">Show me Online</label>
+                            </div><!--end form-switch-->
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="settings-switch5" checked="">
+                                <label class="form-check-label" for="settings-switch5">Status visible to all</label>
+                            </div><!--end form-switch-->
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="settings-switch6">
+                                <label class="form-check-label" for="settings-switch6">Notifications Popup</label>
+                            </div><!--end form-switch-->
+                        </div><!--end /div-->               
+                    </div><!--end offcanvas-body-->
+                </div>
+                <!--end Rightbar/offcanvas-->
+                 <!--end Rightbar-->
+                 
+                <!--Start Footer-->
+                <!-- Footer Start -->
+                <footer class="footer text-center text-sm-start">Copyright &copy; 2022.Company name All rights reserved.<a target="_blank" href="https://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></footer>
+                <!-- end Footer -->                
+                <!--end footer-->
+            </div>
+            <!-- end page content -->
+        </div>
+        <!-- end page-wrapper -->
+
+        <!-- Javascript  -->   
+
+        <script src="apexcharts.min.js"></script>
+        <script src="analytics-index.init.js"></script>
+
+
+        <!-- App js -->
+        <script src="app.js"></script>
+
+    </body>
+    <!--end body-->
 </html>
