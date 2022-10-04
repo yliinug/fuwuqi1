@@ -1,16 +1,16 @@
 @font-face {
     font-family: "Pacifico-Regular";
-    src: url('../font/Pacifico-Regular.ttf') format('truetype');
+    src: url('/Pacifico-Regular.ttf') format('truetype');
 }
 
 @font-face {
     font-family: "UnidreamLED";
-    src: url('../font/UnidreamLED.ttf') format('truetype');
+    src: url('/UnidreamLED.ttf') format('truetype');
 }
 
 @font-face {
     font-family: "MiSans";
-    src: url('../font/MiSans-Regular.woff') format('woff');
+    src: url('/MiSans-Regular.woff') format('woff');
 }
 
 @font-face {
