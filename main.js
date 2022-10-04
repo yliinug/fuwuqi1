@@ -1,863 +1,342 @@
-/**
- * main.js
- * http://www.codrops.com
- *
- * Licensed under the MIT license.
- * http://www.opensource.org/licenses/mit-license.php
- * 
- * Copyright 2017, Codrops
- * http://www.codrops.com
- */
-;(function(window) {
-
-	/**
-	 * FolderFx obj.
-	 */
-	function FolderFx(el) {
-		this.DOM = {};
-		this.DOM.el = el;
-		this.DOM.wrapper = this.DOM.el.querySelector('.folder__icon');
-		this.DOM.back = this.DOM.wrapper.querySelector('.folder__icon-img--back');
-		this.DOM.cover = this.DOM.wrapper.querySelector('.folder__icon-img--cover');
-		this.DOM.feedback = this.DOM.el.querySelector('.folder__feedback');
-		this.DOM.preview = this.DOM.el.querySelector('.folder__preview');
-		this.DOM.previewElems = this.DOM.preview.children;
-		this.totalPreview = this.DOM.previewElems.length;
-
-		this._initEvents();
-	}
-
-	/**
-	 * Remove/Stop any animation.
-	 */
-	FolderFx.prototype._removeAnimeTargets = function() {
-		anime.remove(this.DOM.preview);
-		anime.remove(this.DOM.previewElems);
-		anime.remove(this.DOM.wrapper);
-		anime.remove(this.DOM.cover);
-		anime.remove(this.DOM.el);
-		if( this.DOM.feedback ) {
-			anime.remove(this.DOM.feedback);
-			this.DOM.feedback.style.opacity = 0;
-		}
-		if( this.DOM.letters ) {
-			anime.remove(this.DOM.letters);
-		}
-	};
-
-	FolderFx.prototype._initEvents = function() {
-		const self = this;
-		this._mouseenterFn = function() {
-			self.intimeout = setTimeout(function() {
-				self._removeAnimeTargets();
-				self._in();
-			}, 75);
-		};
-		this._mouseleaveFn = function() {
-			clearTimeout(self.intimeout);
-			self._removeAnimeTargets();
-			self._out();
-		};
-		this.DOM.wrapper.addEventListener('mouseenter', this._mouseenterFn);
-		this.DOM.wrapper.addEventListener('mouseleave', this._mouseleaveFn);
-	};
-
-	FolderFx.prototype._in = function() {
-		const self = this;
-		[].slice.call(this.DOM.previewElems).forEach(function(el) {
-			// Add default behaviour.
-			//el.style.opacity = 1;
-		});
-	};
-
-	FolderFx.prototype._out = function() {
-		const self = this;
-		[].slice.call(this.DOM.previewElems).forEach(function(el) {
-			// Add default behaviour.
-			//el.style.opacity = 0;
-		});
-	};
-
-	/************************************************************************
-	 * 1: DeviFx.
-	 ************************************************************************/
-	function DeviFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	DeviFx.prototype = Object.create(FolderFx.prototype);
-	DeviFx.prototype.constructor = DeviFx;
-	
-	DeviFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 600,
-			delay: function(t, i, c) {
-				return (c-i-1)*40;
-			},
-			easing: [0.2,1,0.3,1],
-			translateY: function(t, i, c) {
-				const radius = 150,
-					  startAngle = Math.PI / c,
-					  angle = startAngle/2 + startAngle*i;
-
-				return Math.round(-1*radius*Math.sin(angle)) + 'px';
-			},
-			translateX: function(t, i, c) {
-				const radius = 150,
-					  startAngle = Math.PI / c,
-					  angle = startAngle/2 + startAngle*i;
-
-				return Math.round(radius*Math.cos(angle)) + 'px';
-			},
-			scale: [0.7,1],
-			opacity: {
-				value: 1,
-				duration: 10,
-				easing: 'linear'
-			}
-		});
-	};
-
-	DeviFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 600,
-			delay: function(t, i, c) {
-				return (c-i-1)*40;
-			},
-			easing: [0.2,1,0.3,1],
-			translateY: 0,
-			translateX: 0,
-			scale: [1,0.7],
-			opacity: {
-				value: 0,
-				duration: 10,
-				delay: function(t, i, c) {
-					return (c-i-1)*40+600;
-				},
-				easing: 'linear'
-			}
-		});
-	};
-
-	window.DeviFx = DeviFx;
-	
-	/************************************************************************
-	 * 2: RudrasFx.
-	 ************************************************************************/
-	
-	function RudrasFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	RudrasFx.prototype = Object.create(FolderFx.prototype);
-	RudrasFx.prototype.constructor = RudrasFx;
-	
-	RudrasFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 800,
-			delay: function(t, i, c) {
-				return (c-i-1)*80;
-			},
-			easing: 'easeOutElastic',
-			translateY: function(t, i, c) {
-				const radius = 130,
-					  startAngle = Math.PI / c,
-    				  angle = startAngle/2 + startAngle*i;
-
-    			return Math.round(-1*radius*Math.sin(angle)) + 'px';
-			},
-			translateX: function(t, i, c) {
-				const radius = 130,
-					  startAngle = Math.PI / c,
-    				  angle = startAngle/2 + startAngle*i;
-
-    		    return Math.round(-1*radius*Math.cos(angle)) + 'px';
-			},
-			scale: [0,1],
-			opacity: {
-				value: 1,
-				duration: 10,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 300,
-			easing: 'easeOutExpo',
-			rotateX: [0,-30]
-		});
-	};
-
-	RudrasFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 300,
-			delay: function(t, i, c) {
-				return i*40;
-			},
-			easing: 'easeInBack',
-			translateY: 0,
-			translateX: 0,
-			scale: [1,0],
-			opacity: {
-				value: 0,
-				duration: 10,
-				delay: function(t, i, c) {
-					return i*40+300;
-				},
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 500,
-			delay: (this.totalPreview-1)*40+200,
-			easing: 'easeOutExpo',
-			rotateX: 0
-		});
-	};
-
-	window.RudrasFx = RudrasFx;
-
-	/************************************************************************
-	 * 3: ArdraFx.
-	 ************************************************************************/
-	
-	function ArdraFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	ArdraFx.prototype = Object.create(FolderFx.prototype);
-	ArdraFx.prototype.constructor = ArdraFx;
-	
-	ArdraFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 500,
-			easing: [0.1,1,0.3,1],
-			translateY: function(t, i, c) {
-				const radius = anime.random(110,160);
-				return Math.round(radius * Math.sin(2*(i+1)*Math.PI/c)) + 'px';
-			},
-			translateX: function(t, i, c) {
-				const radius = anime.random(110,160);
-				return Math.round(radius * Math.cos(2*(i+1)*Math.PI/c)) + 'px';
-			},
-			rotate: function(t, i, c) {
-				return [0,anime.random(-3,3) + 'deg'];
-			},
-			scale: [0.4,1],
-			opacity: {
-				value: 1,
-				duration: 10,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.wrapper,
-			duration: 500,
-			easing: [0.1,1,0.3,1],
-			scale: [1,0.8]
-		});
-
-		anime({
-			targets: this.DOM.feedback,
-			easing: [0.1,1,0.3,1],
-			opacity: [
-				{ 
-					value:1, 
-					duration:10
-				},
-				{ 
-					value:0, 
-					duration:400, 
-					delay:50 
-				}
-			],
-			scale: {
-				value: [1,10],
-				duration: 900
-			}
-		});
-	};
-
-	ArdraFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 500,
-			easing: [0.1,1,0.3,1],
-			translateY: 0,
-			translateX: 0,
-			rotate: 0,
-			scale: [1,0.4],
-			opacity: {
-				value: 0,
-				duration: 250,
-				delay: 250,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.wrapper,
-			duration: 500,
-			easing: [0.1,1,0.3,1],
-			scale: [0.8,1]
-		});
-	};
-
-	window.ArdraFx = ArdraFx;
-
-	/************************************************************************
-	 * 4: ShaktiFx.
-	 ************************************************************************/
-	
-	function ShaktiFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	ShaktiFx.prototype = Object.create(FolderFx.prototype);
-	ShaktiFx.prototype.constructor = ShaktiFx;
-	
-	ShaktiFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 500,
-			delay: function(t, i, c) {
-				return i*80;
-			},
-			easing: [0.1,1,0.3,1],
-			rotate: function(t, i,c) { 
-				return [0,-10*(c-i-1) - 15 + 'deg']; 
-			},
-			opacity: {
-				value: 1,
-				duration: 10,
-				delay: function(t, i, c) {
-					return i*80 + 10;
-				},
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.el,
-			duration: 400,
-			easing: [0.2,1,0.3,1],
-			translateY: [0,15+'px']
-		});
-	};
-
-	ShaktiFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 500,
-			easing: [0.1,1,0.3,1],
-			rotate: 0,
-			opacity: {
-				value: 0,
-				duration: 20,
-				delay: 80,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.el,
-			duration: 400,
-			easing: [0.2,1,0.3,1],
-			translateY: 0
-		});
-	};
-
-	window.ShaktiFx = ShaktiFx;
-
-	/************************************************************************
-	 * 5: KuberaFx.
-	 ************************************************************************/
-	
-	function KuberaFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	KuberaFx.prototype = Object.create(FolderFx.prototype);
-	KuberaFx.prototype.constructor = KuberaFx;
-	
-	KuberaFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 400,
-			easing: 'linear',
-			delay: function(t, i, c) {
-				return i*300;
-			},
-			translateY: function(t, i, c) {
-				return -1*anime.random(180,250) + 'px';
-			},
-			translateX: function(t, i, c) {
-				return anime.random(-25,25) + 'px';
-			},
-			rotate: function(t, i) {
-				return anime.random(-20,20) + 'deg';
-			},
-			opacity: [
-				{ 
-					value:1, 
-					duration:10
-				},
-				{ 
-					value:0, 
-					duration:200, 
-					delay:200 
-				}
-			],
-			loop: true
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 400,
-			easing: 'easeOutExpo',
-			rotateX: [0,-40]
-		});
-	};
-
-	KuberaFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 100,
-			easing: 'linear',
-			rotate: 0,
-			opacity: 0
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 300,
-			easing: 'easeOutExpo',
-			rotateX: 0
-		});
-	};
-
-	window.KuberaFx = KuberaFx;
-
-	/************************************************************************
-	 * 6: HariFx.
-	 ************************************************************************/
-	
-	function HariFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	HariFx.prototype = Object.create(FolderFx.prototype);
-	HariFx.prototype.constructor = HariFx;
-	
-	HariFx.prototype._in = function() {
-		const self = this,
-			firstStepDuration = 200;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 800,
-			delay: firstStepDuration,
-			easing: 'easeOutElastic',
-			elasticity: 400,
-			translateY: function(t, i, c) {
-				const radius = 140,
-					  startAngle = Math.PI / c,
-					  angle = startAngle/2 + startAngle*i;
-
-				return Math.round(radius*Math.sin(angle)) + 'px';
-			},
-			translateX: function(t, i, c) {
-				const radius = 140,
-					  startAngle = Math.PI / c,
-					  angle = startAngle/2 + startAngle*i;
-
-				return Math.round(radius*Math.cos(angle)) + 'px';
-			},
-			scale: [0.5,1],
-			opacity: {
-				value: 1,
-				duration: 10,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.wrapper,
-			translateY: [
-				{ 
-					value: -20 + 'px', 
-					duration: 800, 
-					delay: firstStepDuration, 
-					elasticity: 300 
-				},
-			],
-			scaleY: [
-				{ 
-					value: 0.8, 
-					duration: firstStepDuration, 
-					easing: 'easeOutExpo' 
-				},
-				{ 
-					value: .9, 
-					duration: 800, 
-					elasticity: 300 
-				}
-			],
-			scaleX: [
-				{ 
-					value: 1.1, 
-					duration: firstStepDuration, 
-					easing: 'easeOutExpo' 
-				},
-				{ 
-					value: .9, 
-					duration: 800, 
-					elasticity: 300 
-				}
-			]
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 400,
-			delay: firstStepDuration,
-			easing: 'easeOutExpo',
-			rotateX: [0,-25]
-		});
-
-		anime({
-			targets: this.DOM.feedback,
-			delay: firstStepDuration,
-			easing: [0.1,1,0.3,1],
-			opacity: [
-				{ 
-					value:1, 
-					duration:10
-				},
-				{ 
-					value:0, 
-					duration:700, 
-					delay:50 
-				}
-			],
-			scale: {
-				value: [1,15],
-				duration: 1100
-			}
-		});
-	};
-
-	HariFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 400,
-			easing: 'easeOutExpo',
-			translateY: 0,
-			translateX: 0,
-			scale: [1,0.5],
-			opacity: {
-				value: 0,
-				duration: 10,
-				delay: 400,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.wrapper,
-			duration: 400,
-			easing: 'easeOutExpo',
-			translateY: 0,
-			scaleY: 1,
-			scaleX: 1
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 400,
-			easing: 'easeOutExpo',
-			rotateX: 0
-		});
-	};
-
-	window.HariFx = HariFx;
-
-	/************************************************************************
-	 * 7: RaviFx.
-	 ************************************************************************/
-	
-	function RaviFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	RaviFx.prototype = Object.create(FolderFx.prototype);
-	RaviFx.prototype.constructor = RaviFx;
-	
-	RaviFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this._reorder(this.DOM.previewElems),
-			duration: 400,
-			easing: [0.1,1,0.3,1],
-			translateY: -70,
-			translateX: function(t, i, c) {
-				const interval = 60;
-				return -1*interval*Math.floor(c/2)+interval*i  + (c/2 %1 != 0 ? 0 : interval/2) + 'px';
-			},
-			rotate: function(t, i, c) {
-				const interval = 20;
-				return -1*interval*Math.floor(c/2)+interval*i  + (c/2 %1 != 0 ? 0 : interval/2) + 'deg';
-			},
-			opacity: {
-				value: 1,
-				duration: 10,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 400,
-			easing: 'easeOutExpo',
-			rotateX: [0,-30]
-		});
-	};
-
-	RaviFx.prototype._out = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 300,
-			easing: 'easeInBack',
-			translateY: 0,
-			translateX: 0,
-			rotate: 0,
-			scale: [1,0.5],
-			opacity: {
-				value: 0,
-				duration: 10,
-				delay: 300,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 300,
-			delay: 300,
-			easing: 'easeOutExpo',
-			rotateX: 0
-		});
-
-		anime({
-			targets: this.DOM.feedback,
-			delay: 350,
-			easing: [0.1,1,0.3,1],
-			opacity: [
-				{ 
-					value:1, 
-					duration:10
-				},
-				{ 
-					value:0, 
-					duration:500, 
-					delay:20 
-				}
-			],
-			scale: {
-				value: [1,5],
-				duration: 800
-			}
-		});
-	};
-
-	RaviFx.prototype._reorder = function(arr) {
-		let newArray = [],
-			i = Math.ceil(arr.length/2),
-			j = i - 1;
-
-		while (j >= 0) {
-			newArray.push(arr[j--]);
-			if (i < arr.length) {
-				newArray.push(arr[i++]);
-			}
-		}
-		return newArray;
-	}
-
-	window.RaviFx = RaviFx;
-
-	/************************************************************************
-	 * 8: DurgaFx.
-	 ************************************************************************/
-	
-	function DurgaFx(el) {
-		FolderFx.call(this, el);
-
-		// Create spans for each letter (preview elements).
-		[].slice.call(this.DOM.previewElems).forEach(function(el) {
-			charming(el);
-		});
-		this.DOM.letters = [].slice.call(this.DOM.preview.querySelectorAll('span'));
-	}
-
-	DurgaFx.prototype = Object.create(FolderFx.prototype);
-	DurgaFx.prototype.constructor = DurgaFx;
-	
-	DurgaFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.letters,
-			duration: 20,
-			delay: function(t, i) {
-				return i*20;
-			},
-			easing: 'linear',
-			opacity: [0,1],
-			begin: function() {
-				self.DOM.preview.style.opacity = 1;
-			}
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 300,
-			easing: 'easeOutExpo',
-			rotateX: [0,-30]
-		});
-	};
-
-	DurgaFx.prototype._out = function() {
-		this.DOM.preview.style.opacity = 0;
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 300,
-			easing: 'easeOutExpo',
-			rotateX: 0
-		});
-	};	
-
-	window.DurgaFx = DurgaFx;
-
-	/************************************************************************
-	 * 9: NandiFx.
-	 ************************************************************************/
-	
-	function NandiFx(el) {
-		FolderFx.call(this, el);
-	}
-
-	NandiFx.prototype = Object.create(FolderFx.prototype);
-	NandiFx.prototype.constructor = NandiFx;
-	
-	NandiFx.prototype._in = function() {
-		const self = this;
-
-		anime({
-			targets: this.DOM.preview,
-			duration: 300,
-			easing: 'easeOutExpo',
-			scale: {
-				value: [0,1],
-				easing: 'easeInOutSine'
-			},
-			translateY: {
-				value: [0,-200]
-			},
-			opacity: {
-				value: 1,
-				duration: 50,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 400,
-			delay: function(t, i) {
-				return i*40 + 200;
-			},
-			easing: [0.1,1,0.3,1],
-			scale: [0,1]
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 300,
-			easing: [0.1,1,0.3,1],
-			rotateX: [0,-30]
-		});
-	};
-
-	NandiFx.prototype._out = function() {
-		anime({
-			targets: this.DOM.preview,
-			duration: 500,
-			easing: 'easeInOutSine',
-			scale: {
-				value: [1,0],
-				easing: 'easeOutExpo'
-			},
-			translateY: 0,
-			opacity: {
-				value: 0,
-				duration: 50,
-				delay: 200,
-				easing: 'linear'
-			}
-		});
-
-		anime({
-			targets: this.DOM.previewElems,
-			duration: 100,
-			easing: 'easeOutQuad',
-			scale: 0
-		});
-
-		anime({
-			targets: this.DOM.cover,
-			duration: 600,
-			delay: 100,
-			easing: 'linear',
-			rotateX: 0
-		});
-	};
-
-	window.NandiFx = NandiFx;
-
-})(window);
+//弹窗样式
+iziToast.settings({
+    timeout: 10000,
+    progressBar: false,
+    close: false,
+    closeOnEscape: true,
+    position: 'topCenter',
+    transitionIn: 'bounceInDown',
+    transitionOut: 'flipOutX',
+    displayMode: 'replace',
+    layout: '1',
+    backgroundColor: '#00000040',
+    titleColor: '#efefef',
+    messageColor: '#efefef',
+    iconColor: '#efefef',
+});
+
+//加载完成后执行
+window.addEventListener('load', function () {
+
+    //载入动画
+    $('#loading-box').attr('class', 'loaded');
+    $('#bg').css("cssText", "transform: scale(1);filter: blur(0px);transition: ease 1.5s;");
+    $('.cover').css("cssText", "opacity: 1;transition: ease 1.5s;");
+    $('#section').css("cssText", "transform: scale(1) !important;opacity: 1 !important;filter: blur(0px) !important");
+
+    //用户欢迎
+    setTimeout(function () {
+        iziToast.show({
+            timeout: 2500,
+            title: hello,
+            message: '欢迎来到我的主页'
+        });
+    }, 800);
+}, false)
+
+setTimeout(function () {
+    $('#loading-text').html("字体及文件加载可能需要一定时间")
+}, 3000);
+
+//延迟加载音乐播放器
+function downloadJSAtOnload() {
+    var element = document.createElement("script");
+    element.src = "music.js";
+    document.body.appendChild(element);
+}
+if (window.addEventListener)
+    window.addEventListener("load", downloadJSAtOnload, false);
+else if (window.attachEvent)
+    window.attachEvent("onload", downloadJSAtOnload);
+else window.onload = downloadJSAtOnload;
+
+//新春灯笼 （ 需要时取消注释 ）
+
+new_element=document.createElement("link");
+new_element.setAttribute("rel","stylesheet");
+new_element.setAttribute("type","text/css");
+new_element.setAttribute("href","lantern.css");
+document.body.appendChild(new_element);
+
+new_element=document.createElement("script");
+new_element.setAttribute("type","text/javascript");
+new_element.setAttribute("src","lantern.js");
+document.body.appendChild(new_element);
+
+
+//火狐浏览器独立样式
+if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
+    var head = document.getElementsByTagName('head')[0];
+    var link = document.createElement('link');
+    link.href = './css/firefox.css';
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    head.appendChild(link);
+    window.addEventListener('load', function () {
+        iziToast.show({
+            timeout: 8000,
+            iconUrl: './img/icon/warn.png',
+            message: '您正在使用火狐浏览器，部分功能可能不支持'
+        });
+    }, false)
+}
+
+//获取一言
+fetch('https://v1.hitokoto.cn?max_length=24')
+    .then(response => response.json())
+    .then(data => {
+        $('#hitokoto_text').html(data.hitokoto)
+        $('#from_text').html(data.from)
+    })
+    .catch(console.error)
+
+//获取天气
+//每日限量 100 次
+//请前往 https://www.tianqiapi.com/ 申请（免费）
+fetch('https://www.yiketianqi.com/free/day?appid=43986679&appsecret=TksqGZT7&unescape=1')
+    .then(response => response.json())
+    .then(data => {
+        $('#wea_text').html(data.wea)
+        $('#city_text').html(data.city)
+        $('#tem_night').html(data.tem_night)
+        $('#tem_day').html(data.tem_day)
+        // $('#win_text').html(data.win)
+        // $('#win_speed').html(data.win_speed)
+    })
+    .catch(console.error)
+
+//获取时间
+var t = null;
+t = setTimeout(time, 1000);
+
+function time() {
+    clearTimeout(t);
+    dt = new Date();
+    var y = dt.getYear() + 1900;
+    var mm = dt.getMonth() + 1;
+    var d = dt.getDate();
+    var weekday = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+    var day = dt.getDay();
+    var h = dt.getHours();
+    var m = dt.getMinutes();
+    var s = dt.getSeconds();
+    if (h < 10) {
+        h = "0" + h;
+    }
+    if (m < 10) {
+        m = "0" + m;
+    }
+    if (s < 10) {
+        s = "0" + s;
+    }
+    //document.getElementById("time").innerHTML = y + "&nbsp;年&nbsp;" + mm + "&nbsp;月&nbsp;" + d + "&nbsp;日&nbsp;" + "<span class='weekday'>" + weekday[day] + "</span><br>" + "<span class='time-text'>" + h + ":" + m + ":" + s + "</span>";
+    $("#time").html(y + "&nbsp;年&nbsp;" + mm + "&nbsp;月&nbsp;" + d + "&nbsp;日&nbsp;" + "<span class='weekday'>" + weekday[day] + "</span><br>" + "<span class='time-text'>" + h + ":" + m + ":" + s + "</span>");
+    t = setTimeout(time, 1000);
+}
+
+//链接提示文字
+$("#social").mouseover(function () {
+    $("#social").css({
+        "background": "rgb(0 0 0 / 25%)",
+        'border-radius': '6px',
+        "backdrop-filter": "blur(5px)"
+    });
+    $("#link-text").css({
+        "display": "block",
+    });
+}).mouseout(function () {
+    $("#social").css({
+        "background": "none",
+        "border-radius": "6px",
+        "backdrop-filter": "none"
+    });
+    $("#link-text").css({
+        "display": "none"
+    });
+});
+
+$("#github").mouseover(function () {
+    $("#link-text").html("去 Github 看看");
+}).mouseout(function () {
+    $("#link-text").html("通过这里联系我");
+});
+$("#qq").mouseover(function () {
+    $("#link-text").html("有什么事吗");
+}).mouseout(function () {
+    $("#link-text").html("通过这里联系我");
+});
+$("#email").mouseover(function () {
+    $("#link-text").html("来封 Email");
+}).mouseout(function () {
+    $("#link-text").html("通过这里联系我");
+});
+$("#telegram").mouseover(function () {
+    $("#link-text").html("你懂的 ~");
+}).mouseout(function () {
+    $("#link-text").html("通过这里联系我");
+});
+$("#twitter").mouseover(function () {
+    $("#link-text").html("你懂的 ~");
+}).mouseout(function () {
+    $("#link-text").html("通过这里联系我");
+});
+
+//更多页面切换
+var shoemore = false;
+$('#switchmore').on('click', function () {
+    shoemore = !shoemore;
+    if (shoemore && $(document).width() >= 990) {
+        $('#container').attr('class', 'container mores');
+        $("#change").html("Oops&nbsp;!");
+        $("#change1").html("哎呀，这都被你发现了（ 再点击一次可关闭 ）");
+    } else {
+        $('#container').attr('class', 'container');
+        $("#change").html("Hello&nbsp;World&nbsp;!");
+        $("#change1").html("一个建立于 21 世纪的小站，存活于互联网的边缘");
+    }
+});
+
+//更多页面关闭按钮
+$('#close').on('click', function () {
+    $('#switchmore').click();
+});
+
+//移动端菜单栏切换
+var switchmenu = false;
+$('#switchmenu').on('click', function () {
+    switchmenu = !switchmenu;
+    if (switchmenu) {
+        $('#row').attr('class', 'row menus');
+        $("#menu").html("<i class='iconfont icon-times'></i>");
+    } else {
+        $('#row').attr('class', 'row');
+        $("#menu").html("<i class='iconfont icon-bars'>");
+    }
+});
+
+//更多弹窗页面
+$('#openmore').on('click', function () {
+    $('#box').css("display", "block");
+    $('#row').css("display", "none");
+    $('#more').css("cssText", "display:none !important");
+});
+$('#closemore').on('click', function () {
+    $('#box').css("display", "none");
+    $('#row').css("display", "flex");
+    $('#more').css("display", "flex");
+});
+
+//监听网页宽度
+window.addEventListener('load', function () {
+    window.addEventListener('resize', function () {
+        //关闭移动端样式
+        if (window.innerWidth >= 600) {
+            $('#row').attr('class', 'row');
+            $("#menu").html("<i class='iconfont icon-bars'>");
+            //移除移动端切换功能区
+            $('#rightone').attr('class', 'row rightone');
+        }
+
+        if (window.innerWidth <= 990) {
+            //移动端隐藏更多页面
+            $('#container').attr('class', 'container');
+            $("#change").html("Hello&nbsp;World&nbsp;!");
+            $("#change1").html("一个建立于 21 世纪的小站，存活于互联网的边缘");
+
+            //移动端隐藏弹窗页面
+            $('#box').css("display", "none");
+            $('#row').css("display", "flex");
+            $('#more').css("display", "flex");
+        }
+    })
+})
+
+//移动端切换功能区
+var changemore = false;
+$('#changemore').on('click', function () {
+    changemore = !changemore;
+    if (changemore) {
+        $('#rightone').attr('class', 'row menus mobile');
+    } else {
+        $('#rightone').attr('class', 'row menus');
+    }
+});
+
+//更多页面显示关闭按钮
+$("#more").hover(function () {
+    $('#close').css("display", "block");
+}, function () {
+    $('#close').css("display", "none");
+})
+
+//屏蔽右键
+document.oncontextmenu = function () {
+    iziToast.show({
+        timeout: 2000,
+        iconUrl: 'warn.png',
+        message: '为了浏览体验，本站禁用右键'
+    });
+    return false;
+}
+
+//自动变灰
+var myDate = new Date;
+var mon = myDate.getMonth() + 1;
+var date = myDate.getDate();
+var days = ['4.4', '5.12', '7.7', '9.9', '9.18', '12.13'];
+for (var day of days) {
+    var d = day.split('.');
+    if (mon == d[0] && date == d[1]) {
+        document.write(
+            '<style>html{-webkit-filter:grayscale(100%);-moz-filter:grayscale(100%);-ms-filter:grayscale(100%);-o-filter:grayscale(100%);filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);_filter:none}</style>'
+        )
+        $("#change").html("Silence&nbsp;in&nbsp;silence");
+        $("#change1").html("今天是中国国家纪念日，全站已切换为黑白模式");
+        window.addEventListener('load', function () {
+            iziToast.show({
+                timeout: 14000,
+                iconUrl: 'candle.png',
+                message: '今天是中国国家纪念日'
+            });
+        }, false);
+    }
+}
+
+//控制台输出
+var styleTitle1 = `
+font-size: 20px;
+font-weight: 600;
+color: rgb(244,167,89);
+`
+var styleTitle2 = `
+font-size:12px;
+color: rgb(244,167,89);
+`
+var styleContent = `
+color: rgb(30,152,255);
+`
+var title1 = '無名の主页'
+var title2 = `
+ _____ __  __  _______     ____     __
+|_   _|  \\/  |/ ____\\ \\   / /\\ \\   / /
+  | | | \\  / | (___  \\ \\_/ /  \\ \\_/ / 
+  | | | |\\/| |\\___ \\  \\   /    \\   /  
+ _| |_| |  | |____) |  | |      | |   
+|_____|_|  |_|_____/   |_|      |_|                                                     
+`
+var content = `
+版 本 号：2.2
+更新日期：2022-04-12
+
+更新说明：
+1. 新增 壁纸个性化设置
+2. 新增 音乐播放器支持音量控制
+3. 优化 部分动画及细节
+4. 优化 页面加载缓慢
+5. 优化 音乐延迟加载
+
+主页:  https://www.imsyy.top
+Github:  https://github.com/imsyy/home
+`
+console.log(`%c${title1} %c${title2}
+%c${content}`, styleTitle1, styleTitle2, styleContent)
