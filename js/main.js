@@ -29,7 +29,7 @@ window.addEventListener('load', function () {
         iziToast.show({
             timeout: 2500,
             title: hello,
-            message: '欢迎来到我的主页'
+            message: '欢迎来到英杰的小家'
         });
     }, 800);
 }, false)
@@ -274,7 +274,7 @@ document.oncontextmenu = function () {
     iziToast.show({
         timeout: 2000,
         iconUrl: './img/icon/warn.png',
-        message: '为了浏览体验，本站禁用右键'
+        message: '嘿嘿被我抓到了，右键想干啥(●ˇ∀ˇ●)'
     });
     return false;
 }
